@@ -1,0 +1,51 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+
+repos:
+  # 1. 일반 유틸리티 (필수)
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace  # 꼬리 공백 제거
+      - id: end-of-file-fixer    # 파일 끝에 빈 줄 추가
+      - id: check-yaml           # YAML 파일 문법 검사 (docker-compose.yml 등)
+      - id: check-json           # JSON 파일 문법 검사 (secrets.json 등)
+      - id: debug-statements     # 디버그 코드 (pdb, breakpoint()) 검사
+
+  # 2. 코드 포맷터: Black (스타일 통일)
+  - repo: https://github.com/psf/black
+    rev: 24.3.0
+    hooks:
+      - id: black
+        language_version: python3.13
+
+  # 3. 린터 및 분석기: Ruff
+  # Ruff는 Isort와 Flake8의 역할을 모두 수행하며 성능이 매우 빠릅니다.
+  - repo: https://github.com/astral-sh/ruff
+    rev: v0.4.2 # 최신 버전으로 업데이트
+    hooks:
+      - id: ruff
+        args: ["--fix", "--exit-zero"] # 가능한 오류는 자동으로 수정 시도
+
+  # 4. 타입 검사: Mypy (정적 타입 안정성 확보)
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.9.0
+    hooks:
+      - id: mypy
+        # 마이그레이션 파일은 보통 타입 검사에서 제외합니다.
+        exclude: (?x)^(migrations/)
+
+  # 5. Django 템플릿 검사: djlint
+  # HTML 유효성, 접근성, 템플릿 문법 등을 검사하여 프론트엔드 코드 품질을 관리
+  - repo: https://github.com/monosans/djlint
+    rev: v1.28.0
+    hooks:
+      - id: djlint
+        args: ["--extension", "html", "--ignore", "H002,T002"]
+
+  # 6. 보안 검사: detect-secrets
+  # 실수로 커밋하려는 코드 내의 API 키, 비밀번호 등의 민감 정보를 감지
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets

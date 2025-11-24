@@ -1,0 +1,49 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: dev_budget_db
+    environment:
+      # POSTGRES_* 변수는 컨테이너 초기화에 사용됩니다.
+      POSTGRES_DB: budget
+      POSTGRES_USER: budget_admin
+      POSTGRES_PASSWORD: budget1234
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5440:5432" # 로컬 5440 포트 -> 컨테이너 5432 포트
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U budget_admin -d budget" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  web:
+    build:
+      context: ..                   # 빌드 컨텍스트를 프로젝트 루트(상위)로 지정
+      dockerfile: docker/Dockerfile # 컨텍스트 내에서 Dockerfile의 경로를 명시
+    container_name: dev_budgeting_site
+    # run.sh 스크립트를 실행하도록 command를 변경 (아래 2번 섹션 참조)
+    command: sh -c "sh /app/scripts/run.sh"
+    volumes:
+      - ../:/app                     # 프로젝트 루트(secrets.json 포함)를 /app에 마운트
+    ports:
+      - "8000:8000"
+    environment:
+      - DJANGO_SETTINGS_MODULE=core.settings.dev
+      # secrets.json에서 로드하도록 권장되지만, 개발 편의상 명시된 변수 유지
+      - SECRET_KEY=c924tofl&x+y@d73!(3svrhf5o9+@f@z4i=0wok8^1cg4vpz=b
+      - DB_USERNAME=budget_admin
+      - DB_PASSWORD=budget1234
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=budget
+      - DB_URL=postgres://budget_admin:budget1234@db:5432/budget
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+      - REFRESH_TOKEN_EXPIRE_MINUTES=1440
+    depends_on:
+      db:
+        condition: service_healthy # DB 상태 점검(healthcheck)이 성공할 때까지 기다립니다.
+
+volumes:
+  db-data:
