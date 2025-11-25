@@ -35,7 +35,7 @@ services:
       - DB_HOST=db
       - DB_PORT=5432
       - DB_NAME=budget
-      - DB_URL=postgres://user:password@db:5432/budget
+      - DB_URL=postgres://budget_admin:budget1234@db:5432/budget
       - ACCESS_TOKEN_EXPIRE_MINUTES=30     # 30분
       - REFRESH_TOKEN_EXPIRE_MINUTES=1440  # 24시간
     depends_on:

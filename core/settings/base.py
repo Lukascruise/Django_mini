@@ -65,7 +65,13 @@ INSTALLED_APPS = [
     "rest_framework",
     "drf_spectacular",
     # 사용자 정의 앱
-    # 'your_app_name',
+    # # 'your_app_name',
+    "users.apps.UsersConfig",
+    "common.apps.CommonConfig",
+    "accounts.apps.AccountsConfig",
+    "transactions.apps.TransactionsConfig",
+    "analysis.apps.AnalysisConfig",
+    "notifications.apps.NotificationsConfig",
 ]
 
 MIDDLEWARE = [
@@ -142,3 +148,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
+
+# 커스텀 User 모델을 사용하도록 지정
+AUTH_USER_MODEL = 'users.User'
